@@ -1,5 +1,4 @@
 package COPProject;
-
 /*
  * Date:4/14/2023
  * Name Steven Luciano-Aguilar
@@ -19,7 +18,7 @@ abstract class Lecture{
     private String building;
     private String labs;
     private String modality;
-    
+    private Student[] list;
 
     public String getModality() {
         return modality;
@@ -193,15 +192,65 @@ class LectureList{
         
     }
 
-    public void classLookUp(String building){
-        for(int i = 0; i < size; i ++){
-            if(list[i].getBuilding() != null){
-                if(list[i].getBuilding().compareTo(building) == 0){
-                    System.out.print("\t "+list[i].getCRN());
+    public void classLookUp(String CRN){
+        String [] parts = CRN.split(" ");
+        int inputs = parts.length;
+        for(int j = 0; j < inputs; j++){
+            for(int i = 0; i < size; i ++){
+                if(list[i].getCRN() != null){
+                    if(list[i].getCRN().compareTo(parts[j]) == 0){
+                        if(list[i] instanceof LectureLabsNoLabs){
+                            if(list[i].getLabs().compareTo("No") == 0){
+                                System.out.print("\t ["+list[i].getCRN()+ "/" + list[i].getPrefix()+"/"+ list[i].getTitl()+"] Added!\n");
+                            }else{
+                                System.out.print("\t ["+ list[i].getPrefix()+"/"+ list[i].getTitl()+"] has these labs:\n");
+                                printLab(i);
+                            }
+                        }else{
+                            System.out.print("\t ["+list[i].getCRN()+ "/" + list[i].getPrefix()+"/"+ list[i].getTitl() +"] Added!\n"); 
+                        }
+                    }
                 }
             }
         }
     }
+
+    public void printLab(int index){
+        index = index + 1;
+        int end = index +3;
+
+        for(int i = index; i < end; i++){
+            System.out.print("\t \t "+list[i]+"\n");
+        }
+    }
+
+    public void deleteLecture(String CRN){
+        for(int i = 0; i < size; i ++){
+            if(list[i].getCRN().compareTo(CRN) == 0){
+                if(list[i] instanceof LectureLabsNoLabs){
+                    if(list[i].getLabs().compareTo("No") == 0){
+                        list[i] = null;
+                    }else{
+                        list[i] = null;
+                        deleteLab(i);
+                    }
+                }else{
+                    list[i] = null; 
+                }
+            }
+        }
+    }
+
+    public void deleteLab(int index){
+        index = index + 1;
+        int end = index +3;
+
+        for(int i = index; i < end; i++){
+            list[i] = null;
+        }
+
+    }
+    
 
     public void rewrite(){
         try {
@@ -291,8 +340,26 @@ class Faculty extends Student{
 }
 
 class UserList{
-    Student[] list;
+    private Student[] list;
+    private int size = 0;
 
+    public void expand(){
+        Student[] newList = new Student[list.length + 1];
+        System.arraycopy(list, 0, newList, 0, list.length);
+
+        list = newList;
+    }
+
+    public void newUser(){
+        size++;
+        expand();
+
+    }
+
+    public void listStudent(){
+
+    }
+    
 
 }
 
@@ -329,9 +396,17 @@ public class FinalProject {
             
 
             choice = myScan.nextInt();
+            myScan.nextLine();
 
             switch(choice){
                 case 1:
+                    //get faculty ID
+                    //get faculty name 
+                    //get faculty office
+                    //get number lecturs
+                    
+                    System.out.print("Enter the crns of the lectures:");// get CRNS
+                    list.classLookUp(myScan.nextLine());//Do a look up through CRN
                     break;
                 case 2:
                     break;
@@ -342,6 +417,8 @@ public class FinalProject {
                 case 5:
                     break;
                 case 6:
+                    System.out.print("Enter the CRN of the lecture to delete:");
+                    list.deleteLecture(myScan.nextLine());//get CRN (Not Woorking "Cannot invoke "Lecture.getCRN()" because "this.list[<local2>]" is null")
                     break;
                 case 7:
                     keepGoing = false;
