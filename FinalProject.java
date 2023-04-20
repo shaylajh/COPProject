@@ -405,7 +405,7 @@ public class FinalProject {
                     //get faculty office
                     //get number lecturs
                     
-                    System.out.print("Enter the crns of the lectures:");// get CRNS
+                    System.out.print("Enter the crns of the lectures:"); //get CRNS
                     list.classLookUp(myScan.nextLine());//Do a look up through CRN
                     break;
                 case 2:
@@ -418,7 +418,7 @@ public class FinalProject {
                     break;
                 case 6:
                     System.out.print("Enter the CRN of the lecture to delete:");
-                    list.deleteLecture(myScan.nextLine());//get CRN (Not Woorking "Cannot invoke "Lecture.getCRN()" because "this.list[<local2>]" is null")
+                    list.deleteLecture(myScan.nextLine()); //get CRN (Not Woorking "Cannot invoke "Lecture.getCRN()" because "this.list[<local2>]" is null")
                     break;
                 case 7:
                     keepGoing = false;
