@@ -18,12 +18,20 @@ abstract class Lecture{
     private String building;
     private String labs;
     private String modality;
-    private Student[] list;
+    private int idNum;
+
+    
+
+    public int getIdNum() {
+        return idNum;
+    }
+    public void setIdNum(int idNum) {
+        this.idNum = idNum;
+    }
 
     public String getModality() {
         return modality;
     }
-
     public void setModality(String modality) {
         this.modality = modality;
     }
@@ -34,37 +42,41 @@ abstract class Lecture{
     public void setCRN(String cRN) {
         crn = cRN;
     }
+
     public String getPrefix() {
         return prefix;
     }
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
+
     public String getTitl() {
         return titl;
     }
     public void setTitl(String titl) {
         this.titl = titl;
     }
+
     public String getGrad() {
         return grad;
     }
     public void setGrad(String grad) {
         this.grad = grad;
     }
+
     public String getBuilding() {
         return building;
     }
     public void setBuilding(String building) {
         this.building = building;
     }
+
     public String getLabs() {
         return labs;
     }
     public void setLabs(String labs) {
         this.labs = labs;
     }
-    
 } 
 
 class LectureLabsNoLabs extends Lecture{
@@ -142,6 +154,7 @@ class LectureList{
         list [counter] = new Online(crn, prefix, titl, grad, modality);
     }
 
+    //open the file to find how big the array has to be to store contents
     public LectureList(String FILE, Scanner myScan){
         boolean done = false;
         this.myScan = myScan;
@@ -168,6 +181,7 @@ class LectureList{
         CleanFile(FILE);
     }
 
+    //take the contents of the file and then place it in an array
     private void FillList(String FILE){
         int counter = 0;
         try (Scanner reader = new Scanner(new File(FILE))) {
@@ -192,6 +206,7 @@ class LectureList{
         
     }
 
+    //look up class by CRN
     public void classLookUp(String CRN){
         String [] parts = CRN.split(" ");
         int inputs = parts.length;
@@ -215,43 +230,70 @@ class LectureList{
         }
     }
 
+    //print the labs 
     public void printLab(int index){
         index = index + 1;
-        int end = index +3;
+        int end = index + 3;
 
         for(int i = index; i < end; i++){
             System.out.print("\t \t "+list[i]+"\n");
         }
     }
 
+    //find the lecture delete the lecture and exit the function
     public void deleteLecture(String CRN){
         for(int i = 0; i < size; i ++){
             if(list[i].getCRN().compareTo(CRN) == 0){
                 if(list[i] instanceof LectureLabsNoLabs){
                     if(list[i].getLabs().compareTo("No") == 0){
                         list[i] = null;
+                        shiftLift(i);
+                        shrink(1);
+                        return;
                     }else{
                         list[i] = null;
+                        shiftLift(i);
                         deleteLab(i);
+                        return;
                     }
                 }else{
                     list[i] = null; 
+                    shiftLift(i);
+                    shrink(1);
+                    return;
                 }
             }
         }
     }
 
+    //turning the next 3 indexes to null
     public void deleteLab(int index){
-        index = index + 1;
+        int nullCount = 4;
         int end = index +3;
 
         for(int i = index; i < end; i++){
-            list[i] = null;
+            list[index] = null;
+            shiftLift(index);
         }
+        shrink(nullCount);
+    }
 
+    //this will shift all contents from the starting points to the left
+    public void shiftLift(int index){
+        for(int i = index; i < size - 1; i++)
+            list[i] = list[i + 1];
+    }
+
+    //This will shrink the array taking out the last index of the array 
+    public void shrink(int nullCount){
+        Lecture[] newList = new Lecture[list.length - nullCount];
+        System.arraycopy(list, 0, newList, 0, list.length - nullCount);
+        
+        list = newList;
+        size = list.length;
     }
     
-
+    //creat the file of lecturs with changes if any 
     public void rewrite(){
         try {
             FileWriter myWriter = new FileWriter("lec.txt");
@@ -264,8 +306,10 @@ class LectureList{
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+        myScan.close();
     }
     
+    //empty the file
     private void CleanFile(String FILE){
         try {
             new FileWriter(FILE, false).close();
@@ -275,10 +319,10 @@ class LectureList{
     }
 }
 
-class Student{
+abstract class User{
     private int id;
     private String name;
-    private Lecture [] link;
+    private LectureList [] link;
 
      
     public int getId() {
@@ -293,15 +337,12 @@ class Student{
     public void setName(String name) {
         this.name = name;
     }
-    public Lecture[] getLink() {
-        return link;
-    }
-    public void setLink(Lecture[] link) {
-        this.link = link;
-    }
 }
 
-class TA extends Student{
+class Student extends User{
+}
+
+class TA extends User{
     private String supervisor;
     private String degree;
 
@@ -320,7 +361,7 @@ class TA extends Student{
     
 }
 
-class Faculty extends Student{
+class Faculty extends User{
     private String rank;
     private String office;
     
@@ -340,14 +381,20 @@ class Faculty extends Student{
 }
 
 class UserList{
-    private Student[] list;
+    private User[] list;
     private int size = 0;
+    private Scanner myScan;
 
-    public void expand(){
-        Student[] newList = new Student[list.length + 1];
-        System.arraycopy(list, 0, newList, 0, list.length);
+    public UserList(Scanner myScan){
+        this.myScan = myScan;
+    }
 
-        list = newList;
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public void newUser(){
@@ -356,9 +403,25 @@ class UserList{
 
     }
 
-    public void listStudent(){
+    public void expand(){
+        User[] newList = new User[list.length + 1];
+
+        System.arraycopy(list, 0, newList, 0, list.length);
+        
+        list = newList;
+    }
+    
+    public void setUser(){
+        expand();
+        list[size - 1] = new Faculty();
+        System.out.print("Enter UCF id:");
+        list[size - 1].setId(myScan.nextInt());
+        System.out.print("Enter name:");
+        list[size - 1].setName(myScan.nextLine());
+        
 
     }
+    
     
 
 }
@@ -401,6 +464,7 @@ public class FinalProject {
             switch(choice){
                 case 1:
                     //get faculty ID
+
                     //get faculty name 
                     //get faculty office
                     //get number lecturs
@@ -417,8 +481,10 @@ public class FinalProject {
                 case 5:
                     break;
                 case 6:
+
+                    //I was able to delete only lectures for now
                     System.out.print("Enter the CRN of the lecture to delete:");
-                    list.deleteLecture(myScan.nextLine()); //get CRN (Not Woorking "Cannot invoke "Lecture.getCRN()" because "this.list[<local2>]" is null")
+                    list.deleteLecture(myScan.nextLine());//get CRN to delete lecture
                     break;
                 case 7:
                     keepGoing = false;
