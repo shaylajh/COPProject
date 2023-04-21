@@ -173,7 +173,6 @@ class LectureList{
                 FILE = myScan.nextLine();
             }
         }
-        //myScan.close();
         list = new Lecture[size];
         for(int i = 0; i < size; i++) list[i]= null;
 
@@ -324,6 +323,11 @@ abstract class User{
     private String name;
     private LectureList [] link;
 
+    public User(int id, String name){
+        setId(id);
+        setName(name);
+    }
+
      
     public int getId() {
         return id;
@@ -340,11 +344,20 @@ abstract class User{
 }
 
 class Student extends User{
+    public Student(int id, String name){
+        super(id, name);
+    }
 }
 
 class TA extends User{
     private String supervisor;
     private String degree;
+
+    public TA(int id, String name, String supervisor, String degree){
+        super(id, name);
+        setSupervisor(supervisor);
+        setDegree(degree);
+    }
 
     public String getSupervisor() {
         return supervisor;
@@ -359,12 +372,20 @@ class TA extends User{
         this.degree = degree;
     }
     
+    
+    
 }
 
 class Faculty extends User{
     private String rank;
     private String office;
     
+    public Faculty(int id, String name, String rank, String office) {
+        super(id, name);
+        setRank(rank);
+        setOffice(office);
+    }
+
     public String getRank() {
         return rank;
     }
@@ -381,26 +402,22 @@ class Faculty extends User{
 }
 
 class UserList{
+    private int spot = 0;
     private User[] list;
-    private int size = 0;
     private Scanner myScan;
+
+    public int getSpot() {
+        return spot;
+    }
+
+    public void setSpot(int spot) {
+        this.spot = spot;
+    }
 
     public UserList(Scanner myScan){
         this.myScan = myScan;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public void newUser(){
-        size++;
-        expand();
-
+        list = new User[1];
+        list[0] = null;
     }
 
     public void expand(){
@@ -409,17 +426,30 @@ class UserList{
         System.arraycopy(list, 0, newList, 0, list.length);
         
         list = newList;
+        list[list.length] = null;
     }
     
-    public void setUser(){
-        expand();
-        list[size - 1] = new Faculty();
-        System.out.print("Enter UCF id:");
-        list[size - 1].setId(myScan.nextInt());
-        System.out.print("Enter name:");
-        list[size - 1].setName(myScan.nextLine());
-        
 
+    //Incomplete TODO make the check for the amount of classes the the Falculty is doing
+    //           TODO link the classes to falculty
+    public void falcultyEntry(LectureList lec){
+        System.out.print("Enter UCF id:");
+        int id = myScan.nextInt();
+        System.out.print("Enter name: ");
+        String name = myScan.nextLine().toLowerCase();
+        myScan.nextLine();
+        System.out.print("Enter rank:");
+        String rank = myScan.nextLine();
+        System.out.print("Enter office location:");
+        String office = myScan.nextLine();
+        System.out.print("How many Lectures");
+        myScan.nextInt();
+        System.out.print("Enter the crns of the lectures:");
+        lec.classLookUp(myScan.nextLine());
+
+        list[spot] = new Faculty(id, name, rank, office);
+
+        
     }
     
     
@@ -443,7 +473,7 @@ public class FinalProject {
         myScan.nextLine();//flush
 
         LectureList list = new LectureList(FILE,myScan);
-        
+        UserList user = new UserList(myScan);
         do{
             
             System.out.print("***********************************************\n");
@@ -463,11 +493,7 @@ public class FinalProject {
 
             switch(choice){
                 case 1:
-                    //get faculty ID
-
-                    //get faculty name 
-                    //get faculty office
-                    //get number lecturs
+                    user.falcultyEntry(list);
                     
                     System.out.print("Enter the crns of the lectures:"); //get CRNS
                     list.classLookUp(myScan.nextLine());//Do a look up through CRN
@@ -500,4 +526,6 @@ public class FinalProject {
         System.out.print("Done");
         myScan.close();
     }
+
 }
+
