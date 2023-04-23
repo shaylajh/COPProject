@@ -502,13 +502,29 @@ class UserList{
         list[spot].printCRN();
         
         spot++;
+    }
+
+    public void studentEntry(LectureList list){
+        System.out.print("Enter UCF id:");
+        int id = myScan.nextInt();
+        myScan.nextLine();
+        //id Should be added Here
+        System.out.print("Enter name: ");
+        String name = myScan.nextLine();
+
+        System.out.printf("Which lecture to enroll [%s] in?", name);
+        String[] parts = list.classLookUp(myScan.nextLine(), 1);
+
         
+        System.out.printf("[%s]is added to lab:", name);
+
     }
 }
 
 
 
-public class FinalProject {
+public class FinalProject{
+    
     public static void main(String[] args) {
         boolean keepGoing = true;
         int choice;
@@ -540,9 +556,9 @@ public class FinalProject {
             switch(choice){
                 case 1:
                     user.falcultyEntry(list);
-                    
                     break;
                 case 2:
+                    user.studentEntry(list);
                     break;
                 case 3:
                     break;
@@ -574,32 +590,34 @@ public class FinalProject {
 }
 
 
-/*//_________________________________________________________________________
-class CheckId{
+//_________________________________________________________________________
+class CheckId extends IdException{
     
     boolean tf = false;
 
-    while(tf == false){
-        Scanner myScan = new Scanner(System.in);
-        String  id = myScan.nextLine();
-        try{
-            if(id.length() == 7){
-                tf = true;
+    public void idCheck(){
+        while(tf == false){
+            Scanner myScan = new Scanner(System.in);
+            String  id = myScan.nextLine();
+            try{
+                if(id.length() == 7){
+                    tf = true;
+                }else{
+                    throw new IdException();
+                }
+            }catch(IdException e){
+                IdException obj = new IdException();
+                System.out.println(obj.getLocalizedMessage());
             }
-            else{
-                throw new IdException();
-            }
-        }catch(IdException e){
-            IdException obj = new IdException();
-            System.out.println(obj.getLocalizedMessage());
         }
     }
 }
 //___________________________________________________________________
-class IdExcepion extends Exception{
+class IdException extends Exception{
     @Override
     public String getLocalizedMessage(){
         return ">>>>>> Sorry incorrect format. (Ids  are 7 digits)";
     }
 }
-*/
+
+
