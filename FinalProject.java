@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Random;
 import java.util.*;
 
 abstract class Lecture{
@@ -210,8 +211,9 @@ class LectureList{
     }
 
     //look up class by CRN
-    public String[] classLookUp(String CRN, int numLec){
+    public Lecture[] classLookUp(String CRN, int numLec){
         String [] parts = CRN.split(" ");
+        Lecture[] lec;
         int inputs = parts.length;
         while(numLec != inputs){
             System.out.print("Number of crn entered is incorrect.\n Enter the crns of the lectures: ");
@@ -219,7 +221,8 @@ class LectureList{
             parts = CRN.split(" ");
             inputs = parts.length;
         }
-        
+        lec = new Lecture[size];
+
         for(int j = 0; j < inputs; j++){
             for(int i = 0; i < size; i ++){
                 if(list[i].getCRN() != null){
@@ -227,18 +230,21 @@ class LectureList{
                         if(list[i] instanceof LectureLabsNoLabs){
                             if(list[i].getLabs().compareTo("No") == 0){
                                 System.out.print("\t ["+list[i].getCRN()+ "/" + list[i].getPrefix()+"/"+ list[i].getTitl()+"] Added!\n");
+                                lec[i] = list[i];
                             }else{
                                 System.out.print("\t ["+ list[i].getPrefix()+"/"+ list[i].getTitl()+"] has these labs:\n");
+                                lec[i] = list[i];
                                 printLab(i);
                             }
                         }else{
                             System.out.print("\t ["+list[i].getCRN()+ "/" + list[i].getPrefix()+"/"+ list[i].getTitl() +"] Added!\n"); 
+                            lec[i] = list[i];
                         }
                     }
                 }
             }
         }
-        return parts;
+        return lec;
     }
 
     //print the labs 
@@ -249,6 +255,23 @@ class LectureList{
         for(int i = index; i < end; i++){
             System.out.print("\t \t "+list[i]+"\n");
         }
+    }
+
+    public LabClass[] getLab(String CRN){
+        LabClass [] parts = new LabClass[3];
+        int index = 0;
+        for(int i = 0; i < size; i++){
+            if(list[i].getCRN().compareTo(CRN) == 0){
+                for(int j =(i+1); j < (i + 3); j++){
+                    if(list[j] instanceof LabClass){
+                        parts[index] = (LabClass)list[j];
+                    }
+                    index++;
+                }
+            }
+        }
+
+        return parts;
     }
 
     //find the lecture delete the lecture and exit the function
@@ -336,7 +359,7 @@ abstract class User{
     private int id;
     private String name;
     private int numLec;
-    private String[] CRN;
+    private Lecture[] lec;
 
     public User(int id, String name, int numLec){
         setId(id);
@@ -348,10 +371,10 @@ abstract class User{
      
 
     public void setCRNList(){
-        CRN = new String[numLec];
+        lec = new Lecture[numLec];
     }
-    public void insertCRN(String[] parts){
-        CRN = parts;
+    public void insertCRN(Lecture[] parts){
+        lec = parts;
     }
     
     public int getNumLec() {
@@ -372,13 +395,13 @@ abstract class User{
     public void setName(String name) {
         this.name = name;
     }
-    public String[] getCRN() {
-        return CRN;
+    public Lecture[] getLec() {
+        return lec;
     }
 
     public void printCRN(){
-        for(int i = 0; i < CRN.length; i++){
-            System.out.print(CRN[i]);
+        for(int i = 0; i < lec.length; i++){
+            System.out.print(lec[i]);
         }
     }
 
@@ -470,6 +493,12 @@ class UserList{
         list = newList;
         list[list.length] = null;
     }
+
+    public int randomNum(){
+        Random rand = new Random(); 
+        int num = rand.nextInt(2) + 1;
+        return num;
+    }
     
 
     //Incomplete
@@ -495,7 +524,7 @@ class UserList{
         myScan.nextLine();
 
         System.out.print("Enter the crns of the lectures:");
-        String[] parts = lec.classLookUp(myScan.nextLine(), numLec);
+        Lecture[] parts = lec.classLookUp(myScan.nextLine(), numLec);
 
         list[spot] = new Faculty(id, name, rank, office, lec, numLec);
         list[spot].insertCRN(parts);
@@ -504,7 +533,9 @@ class UserList{
         spot++;
     }
 
-    public void studentEntry(LectureList list){
+    public void studentEntry(LectureList lec){
+
+
         System.out.print("Enter UCF id:");
         int id = myScan.nextInt();
         myScan.nextLine();
@@ -513,12 +544,22 @@ class UserList{
         String name = myScan.nextLine();
 
         System.out.printf("Which lecture to enroll [%s] in?", name);
-        String[] parts = list.classLookUp(myScan.nextLine(), 1);
+        Lecture[] parts = lec.classLookUp(myScan.nextLine(), 1);
+        for(int i = 0; i < parts.length; i++){
+            if(parts[i] instanceof LectureLabsNoLabs){
+                LabClass[] labs = lec.getLab(parts[i].getCRN());
+                LabClass randLab = labs[randomNum()]; 
+                System.out.printf("[%s]is added to lab: %s", name, randLab.getCRN());
+            }
+        }
+       
+        
 
         
-        System.out.printf("[%s]is added to lab:", name);
 
     }
+
+    
 }
 
 
