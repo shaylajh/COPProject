@@ -210,7 +210,7 @@ class LectureList{
     }
 
     //look up class by CRN
-    public void classLookUp(String CRN, int numLec){
+    public String[] classLookUp(String CRN, int numLec){
         String [] parts = CRN.split(" ");
         int inputs = parts.length;
         while(numLec != inputs){
@@ -219,6 +219,7 @@ class LectureList{
             parts = CRN.split(" ");
             inputs = parts.length;
         }
+        
         for(int j = 0; j < inputs; j++){
             for(int i = 0; i < size; i ++){
                 if(list[i].getCRN() != null){
@@ -237,6 +238,7 @@ class LectureList{
                 }
             }
         }
+        return parts;
     }
 
     //print the labs 
@@ -333,15 +335,31 @@ class LectureList{
 abstract class User{
     private int id;
     private String name;
-    private LectureList link;
+    private int numLec;
+    private String[] CRN;
 
-    public User(int id, String name){
+    public User(int id, String name, int numLec){
         setId(id);
         setName(name);
-        link = new LectureList();
+        setNumLec(numLec);
+        setCRNList();
         
     }
      
+
+    public void setCRNList(){
+        CRN = new String[numLec];
+    }
+    public void insertCRN(String[] parts){
+        CRN = parts;
+    }
+    
+    public int getNumLec() {
+        return numLec;
+    }
+    public void setNumLec(int numLec) {
+        this.numLec = numLec;
+    }
     public int getId() {
         return id;
     }
@@ -354,11 +372,21 @@ abstract class User{
     public void setName(String name) {
         this.name = name;
     }
+    public String[] getCRN() {
+        return CRN;
+    }
+
+    public void printCRN(){
+        for(int i = 0; i < CRN.length; i++){
+            System.out.print(CRN[i]);
+        }
+    }
+
 }
 
 class Student extends User{
-    public Student(int id, String name){
-        super(id, name);
+    public Student(int id, String name, int numLec){
+        super(id, name, numLec);
     }
 }
 
@@ -366,8 +394,8 @@ class TA extends User{
     private String supervisor;
     private String degree;
 
-    public TA(int id, String name, String supervisor, String degree){
-        super(id, name);
+    public TA(int id, String name, String supervisor, String degree , int numLec){
+        super(id, name, numLec);
         setSupervisor(supervisor);
         setDegree(degree);
     }
@@ -394,7 +422,7 @@ class Faculty extends User{
     private String office;
     
     public Faculty(int id, String name, String rank, String office, LectureList list, int numLec) {
-        super(id, name);
+        super(id, name, numLec);
         setRank(rank);
         setOffice(office);
 
@@ -467,20 +495,16 @@ class UserList{
         myScan.nextLine();
 
         System.out.print("Enter the crns of the lectures:");
-        lec.classLookUp(myScan.nextLine(), numLec);
+        String[] parts = lec.classLookUp(myScan.nextLine(), numLec);
 
         list[spot] = new Faculty(id, name, rank, office, lec, numLec);
+        list[spot].insertCRN(parts);
+        list[spot].printCRN();
+        
         spot++;
         
     }
-    
-    
-
 }
-
-
-
-
 
 
 
@@ -549,3 +573,33 @@ public class FinalProject {
 
 }
 
+
+/*//_________________________________________________________________________
+class CheckId{
+    
+    boolean tf = false;
+
+    while(tf == false){
+        Scanner myScan = new Scanner(System.in);
+        String  id = myScan.nextLine();
+        try{
+            if(id.length() == 7){
+                tf = true;
+            }
+            else{
+                throw new IdException();
+            }
+        }catch(IdException e){
+            IdException obj = new IdException();
+            System.out.println(obj.getLocalizedMessage());
+        }
+    }
+}
+//___________________________________________________________________
+class IdExcepion extends Exception{
+    @Override
+    public String getLocalizedMessage(){
+        return ">>>>>> Sorry incorrect format. (Ids  are 7 digits)";
+    }
+}
+*/
