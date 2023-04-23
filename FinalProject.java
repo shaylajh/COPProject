@@ -153,6 +153,10 @@ class LectureList{
     public void listOnline(String crn, String prefix, String titl, String grad, String modality, int counter){
         list [counter] = new Online(crn, prefix, titl, grad, modality);
     }
+    
+    public LectureList(){
+        list = new Lecture[1];
+    }
 
     //open the file to find how big the array has to be to store contents
     public LectureList(String FILE, Scanner myScan){
@@ -206,9 +210,15 @@ class LectureList{
     }
 
     //look up class by CRN
-    public void classLookUp(String CRN){
+    public void classLookUp(String CRN, int numLec){
         String [] parts = CRN.split(" ");
         int inputs = parts.length;
+        while(numLec != inputs){
+            System.out.print("Number of crn entered is incorrect.\n Enter the crns of the lectures: ");
+            CRN = myScan.nextLine();
+            parts = CRN.split(" ");
+            inputs = parts.length;
+        }
         for(int j = 0; j < inputs; j++){
             for(int i = 0; i < size; i ++){
                 if(list[i].getCRN() != null){
@@ -307,6 +317,8 @@ class LectureList{
         }
         myScan.close();
     }
+
+    
     
     //empty the file
     private void CleanFile(String FILE){
@@ -321,13 +333,14 @@ class LectureList{
 abstract class User{
     private int id;
     private String name;
-    private LectureList [] link;
+    private LectureList link;
 
     public User(int id, String name){
         setId(id);
         setName(name);
+        link = new LectureList();
+        
     }
-
      
     public int getId() {
         return id;
@@ -380,10 +393,11 @@ class Faculty extends User{
     private String rank;
     private String office;
     
-    public Faculty(int id, String name, String rank, String office) {
+    public Faculty(int id, String name, String rank, String office, LectureList list, int numLec) {
         super(id, name);
         setRank(rank);
         setOffice(office);
+
     }
 
     public String getRank() {
@@ -430,25 +444,33 @@ class UserList{
     }
     
 
-    //Incomplete TODO make the check for the amount of classes the the Falculty is doing
+    //Incomplete
     //           TODO link the classes to falculty
     public void falcultyEntry(LectureList lec){
+        
         System.out.print("Enter UCF id:");
         int id = myScan.nextInt();
-        System.out.print("Enter name: ");
-        String name = myScan.nextLine().toLowerCase();
         myScan.nextLine();
+
+        //id Should be added Here
+        System.out.print("Enter name: ");
+        String name = myScan.nextLine();
+
         System.out.print("Enter rank:");
-        String rank = myScan.nextLine();
+        String rank = myScan.nextLine().toLowerCase();
+
         System.out.print("Enter office location:");
         String office = myScan.nextLine();
-        System.out.print("How many Lectures");
-        myScan.nextInt();
+
+        System.out.print("How many Lectures: ");
+        int numLec = myScan.nextInt();
+        myScan.nextLine();
+
         System.out.print("Enter the crns of the lectures:");
-        lec.classLookUp(myScan.nextLine());
+        lec.classLookUp(myScan.nextLine(), numLec);
 
-        list[spot] = new Faculty(id, name, rank, office);
-
+        list[spot] = new Faculty(id, name, rank, office, lec, numLec);
+        spot++;
         
     }
     
@@ -495,8 +517,6 @@ public class FinalProject {
                 case 1:
                     user.falcultyEntry(list);
                     
-                    System.out.print("Enter the crns of the lectures:");// get CRNS
-                    list.classLookUp(myScan.nextLine());//Do a look up through CRN
                     break;
                 case 2:
                     break;
