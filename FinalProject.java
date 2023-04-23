@@ -1,7 +1,7 @@
 package COPProject;
 /*
  * Date:4/14/2023
- * Name Steven Luciano-Aguilar
+ * Name Steven Luciano-Aguilar and Shayla Hirji
  */
 import java.io.BufferedReader;
 import java.io.File;
@@ -528,4 +528,29 @@ public class FinalProject {
     }
 
 }
-
+//_________________________________________________________________________
+class CheckId{
+    boolean tf =  false;
+    while(tf == false){
+        Scanner myScan = new Scanner(System.in);
+        String  id = myScan.nextLine();
+        try{
+            if(id.length() == 7){
+                tf = true;
+            }
+            else{
+                throw new IdException();
+            }
+        }catch(IdException e){
+            IdException obj = new IdException();
+            System.out.println(obj.getLocalizedMessage());
+        }
+    }
+}
+//___________________________________________________________________
+class IdExcepion extends Exception{
+    @Override
+    public String getLocalizedMessage(){
+        return ">>>>>> Sorry incorrect format. (Ids  are 7 digits)";
+    }
+}
