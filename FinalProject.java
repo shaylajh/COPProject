@@ -543,12 +543,10 @@ class UserList extends CheckId{
     public void taEntry(LectureList lec, String crn) {
         
     	LabClass[] labsForTA = lec.getLab(crn);
-    	System.out.println(labsForTA.length);
-        
-        LabClass[] lab1;
-        LabClass[] lab2;
-        LabClass[] lab3;
-    
+        LabClass[] lab1 = {labsForTA[0]};
+        LabClass[] lab2 = {labsForTA[1]};
+        LabClass[] lab3 = {labsForTA[2]};
+        LabClass[][] arrArrofLabs = {lab1, lab2, lab3};
     	for(int j = 0; j < labsForTA.length; j++){
             boolean exsist = false;
             System.out.println("Enter the TA's ID for "+ labsForTA[j].getCRN());
@@ -568,7 +566,7 @@ class UserList extends CheckId{
                 for(int i = 0; i < list.length - 1; i++){
                     if(list[i].getId() == id){
                         System.out.println("TA found as Student "+list[i].getName());
-                        //list[i].insertLec(lec);
+                        list[i].insertLec(arrArrofLabs[j]);
 
                     }
                 }
@@ -581,7 +579,7 @@ class UserList extends CheckId{
                 System.out.println("Degree seeking: ");
                 String taDegree=myScan.nextLine();
                 //problem
-                list[spot] = new TA(id, taName, taSupe, taDegree, 1, labsForTA);
+                list[spot] = new TA(id, taName, taSupe, taDegree, 1, arrArrofLabs[j]);
                 spot++;
                     
             }
