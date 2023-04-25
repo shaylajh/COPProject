@@ -348,25 +348,22 @@ abstract class User{
         lec = new Lecture[numLec];
     }
     public void insertLec(Lecture[] parts){
-        lec = parts;
-        expandLec();
+        int lecSize = lec.length;
+        if(lecSize == 1){
+            lec = parts;
+            expandLec();
+        }else{
+            int partsSize  = parts.length;
+            int newSize = lecSize + partsSize;
+            Lecture [] temp = new Lecture[newSize];
 
-    }
-    public void printUserLecturs(){
-        int size = lecSize();
-        for (int i = 0; i < size; i++){
-            if(lec[i] instanceof LectureLabsNoLabs){
-                if(lec[i].getLabs().compareTo("YES") == 0)
-                    System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]"+"[Lab:"+ lec[i+1].getCRN()+"]");
-                else
-                    System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]");
-            }else if(lec[i] instanceof Online){
-                System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]"+"[Online]");
-            }
-            
+            System.arraycopy(lec, 0, temp, 0, lecSize);
+            System.arraycopy(parts, 0, temp, lecSize - 1, partsSize);
+
+            lec = temp;
         }
     }
-    
+
     public void expandLec(){
         Lecture[] newList = new Lecture[lec.length + 1];
     
@@ -375,6 +372,23 @@ abstract class User{
         lec = newList;
         lec[lec.length - 1] = null;
     }
+
+    public void printUserLecturs(){
+        int size = lecSize();
+        for (int i = 0; i < size - 1; i++){
+            if(lec[i] instanceof LectureLabsNoLabs){
+                if(lec[i].getLabs().compareTo("YES") == 0)
+                    System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]"+"[Lab:"+ lec[i+1].getCRN()+"]\n");
+                else
+                    System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]\n");
+            }else if(lec[i] instanceof Online){
+                System.out.print("[" + lec[i].getPrefix() +"/"+lec[i].getTitl()+"]"+"[Online]\n");
+            }
+            
+        }
+    }
+    
+    
     
     public int getNumLec() {
         return numLec;
@@ -617,15 +631,16 @@ class UserList extends CheckId{
                 
                 if(lecture[0].getLabs().compareTo("YES") == 0){
                     LabClass[] labs = lec.getLab(lecture[0].getCRN());
-                    LabClass randLab = labs[randomNum()]; 
-                    System.out.printf("[%s]is added to lab: %s", name, randLab.getCRN());
+                    LabClass[] randLab = {labs[randomNum()]}; 
+                    System.out.printf("[%s]is added to lab: %s", name, randLab[0].getCRN());
                     list[spot]= new Student(id, name, 1, lecture);
+                    list[spot].insertLec(randLab);
                     spot++;
                     expand();
                 } 
             }
         }else{
-            for(int i = 0; i < list.length; i++){
+            for(int i = 0; i < list.length - 1; i++){
                 if(list[i].getId() == id){
                     System.out.printf("Which lecture to enroll [%s] in?", list[i].getName());
                     String CRN = myScan.nextLine();
@@ -635,9 +650,9 @@ class UserList extends CheckId{
                     if( lecture[0] instanceof LectureLabsNoLabs){
                         if(lecture[0].getLabs().compareTo("YES") == 0){
                             LabClass[] labs = lec.getLab(lecture[0].getCRN());
-                            LabClass randLab = labs[randomNum()]; 
-                            System.out.printf("[%s] is added to lab: %s \n ", list[i].getName(), randLab.getCRN());
-                            list[i].insertLec(labs);
+                            LabClass[] randLab = {labs[randomNum()]};  
+                            System.out.printf("[%s] is added to lab: %s \n ", list[i].getName(), randLab[0].getCRN());
+                            list[i].insertLec(randLab);
                         } 
                     }
 
@@ -652,7 +667,7 @@ class UserList extends CheckId{
         int size = list.length;
         System.out.print("Enter the UCF id:");
         int id = idCheck(myScan);
-        for(int i = 0; i < size; i++){
+        for(int i = 0; i < size - 1; i++){
             if(list[i].getId() == id){
                 if(list[i] instanceof Student){
                     System.out.print(list[i].getName()+"\n");
@@ -694,7 +709,7 @@ public class FinalProject{
         UserList user = new UserList(myScan);
         do{
             
-            System.out.print("***********************************************\n");
+            System.out.print("\n***********************************************\n");
             System.out.print("Choose one of these options:\n");
             System.out.print("\t 1- Add a new Faculty to the schedule\n"); 
             System.out.print("\t 2- Enroll a Student to a Lecture\n");
