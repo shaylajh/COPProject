@@ -387,6 +387,17 @@ abstract class User{
             
         }
     }
+
+    public void printUserLabs(){
+        int size = lecSize();
+        for (int i = 0; i < size - 1; i++){
+            if(lec[i] instanceof LabClass){
+                System.out.print("[" + lec[i].getCRN() +"/"+lec[i].getBuilding()+"]"+"[Online]\n");
+                    
+            }
+            
+        }
+    }
     
     
     
@@ -561,10 +572,13 @@ class UserList extends CheckId{
         LabClass[] lab2 = {labsForTA[1]};
         LabClass[] lab3 = {labsForTA[2]};
         LabClass[][] arrArrofLabs = {lab1, lab2, lab3};
+
     	for(int j = 0; j < labsForTA.length; j++){
             boolean exsist = false;
             System.out.println("Enter the TA's ID for "+ labsForTA[j].getCRN());
             int id = idCheck(myScan);
+            myScan.nextLine();
+
             for(int k = 0; k < list.length; k++){
                 try{
                     if(list[k].getId() == id){
@@ -595,21 +609,20 @@ class UserList extends CheckId{
                 //problem
                 list[spot] = new TA(id, taName, taSupe, taDegree, 1, arrArrofLabs[j]);
                 spot++;
-                    
+                expand();
             }
-            expand();
+           
         }
     }
 
     
-    //TODO students can also be TAs and vise versa
+    
     public void studentEntry(LectureList lec){
 
         boolean exsist = false;
         System.out.print("Enter UCF id:");
         
         int id = idCheck(myScan);
-
         myScan.nextLine();
 
         for(int i = 0; i < list.length; i++){
@@ -674,8 +687,21 @@ class UserList extends CheckId{
                     System.out.print("Enrolled in the following lectures \n");
                     list[i].printUserLecturs();
                 }
-            }else{
-                System.out.print("Sorry No Student Found\n");
+            }
+        }
+    }
+
+    public void TALectures(){
+        int size = list.length;
+        System.out.print("Enter the UCF id:");
+        int id = idCheck(myScan);
+        for(int i = 0; i < size - 1; i++){
+            if(list[i].getId() == id){
+                if(list[i] instanceof TA){
+                    System.out.print(list[i].getName()+"\n");
+                    System.out.print("Teaching in the following Labs\n");
+                    list[i].printUserLabs();
+                }
             }
         }
     }
@@ -734,6 +760,7 @@ public class FinalProject{
                 case 3:
                     break;
                 case 4:
+                    user.TALectures();
                     break;
                 case 5:
                     user.studentLectures();
